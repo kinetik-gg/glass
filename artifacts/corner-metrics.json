@@ -1,0 +1,26 @@
+{
+  "reference": "Reverse-engineered UIBezierPath continuous rounded rectangle",
+  "samples": 4096,
+  "current": {
+    "exponent": 4.0,
+    "mean_boundary_error_percent_of_corner_extent": 2.3439270479306518,
+    "rms_boundary_error_percent_of_corner_extent": 3.5025097691685834,
+    "max_boundary_error_percent_of_corner_extent": 7.24078582293794,
+    "normalized_corner_area_mismatch_percent": 2.344499295745088
+  },
+  "published_icon_candidate": {
+    "exponent": 5.2,
+    "mean_boundary_error_percent_of_corner_extent": 4.982453752832717,
+    "rms_boundary_error_percent_of_corner_extent": 7.638556834608728,
+    "max_boundary_error_percent_of_corner_extent": 17.55258897779125,
+    "normalized_corner_area_mismatch_percent": 4.983670172205967
+  },
+  "best_native_superellipse_fit": {
+    "exponent": 3.37,
+    "mean_boundary_error_percent_of_corner_extent": 0.37879659741272226,
+    "rms_boundary_error_percent_of_corner_extent": 0.5956966690443111,
+    "max_boundary_error_percent_of_corner_extent": 2.798963426018397,
+    "normalized_corner_area_mismatch_percent": 0.37888907705076247
+  },
+  "note": "Errors are normalized to corner extent; zero requires the piecewise cubic reference rather than one superellipse exponent."
+}

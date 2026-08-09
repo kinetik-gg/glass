@@ -1,0 +1,13 @@
+[repository]
+name = "kinetik-glass"
+authors = ["kinetik-gg"]
+
+[kinetik-glass]
+description = "Framebuffer-sampled liquid glass and continuous corners for Hyprland"
+authors = ["kinetik-gg"]
+output = "build/libkinetik-glass.so"
+build = [
+    "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+    "cmake --build build --parallel",
+]
+since_hyprland = 7643
