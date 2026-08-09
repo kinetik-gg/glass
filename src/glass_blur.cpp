@@ -213,8 +213,23 @@ void drawRegion(const SP<IFramebuffer> &target, const SP<ITexture> &source,
 
 } // namespace
 
+// Iterated separable draws do not stack their reach linearly. Each draw
+// convolves the running image with a small fixed-width kernel (passExtent()
+// wide); convolving independent kernels adds their variances, not their
+// widths, so N draws spread like sqrt(N) single draws, not N of them -- the
+// same random-walk scaling that governs any sum of N iid steps. At the
+// shipped defaults (blur_passes = 4, so blurDraws() = 8; passExtent() = 13;
+// downscale() = 0.25) the old linear model claimed
+// 8 * 13 / 0.25 = 416px, a ~2.8x overclaim versus the sqrt(8) = 2.828 factor
+// that actually governs it: 13 * sqrt(8) / 0.25 ~= 147px. No extra fudge
+// factor is layered on top of that: 147px already lands within the audited
+// ~150px target, and callers still std::ceil() the result while claimDamage()
+// only commits the margin when it actually intersects existing damage, so the
+// tails of the distribution stay covered without re-inflating the common
+// case.
 float Glass::Blur::kernelExtent() {
-  return static_cast<float>(blurDraws() * passExtent()) / downscale();
+  return passExtent() * std::sqrt(static_cast<float>(blurDraws())) /
+      downscale();
 }
 
 void Glass::Blur::claimDamage(const CBox &lensBox) {
