@@ -28,6 +28,16 @@ CLayerGlassPassElement::CLayerGlassPassElement(const SData &data)
                              logical->width, logical->height};
   m_monitorBox =
       m_monitorLogicalBox.copy().scale(monitor->m_scale).round();
+
+  // Layer surfaces need the same pre-pass damage expansion as window glass.
+  // A hover often damages only one button or row; without expanding that to
+  // the lens's optical footprint, refresh() samples last frame's glass from
+  // the untouched part of currentFB and recursively blurs it back into the
+  // new frame. The result is the flicker/ghost geometry visible on interactive
+  // palettes. This constructor runs while the render pass is still being
+  // assembled, which is the point at which claimDamage() can widen the pass.
+  if (!m_data.frameOnly)
+    Glass::Blur::claimDamage(m_monitorBox);
 }
 
 std::vector<UP<IPassElement>> CLayerGlassPassElement::draw() {
