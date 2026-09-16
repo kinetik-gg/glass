@@ -27,4 +27,8 @@ pkg_check_modules(DEPS REQUIRED IMPORTED_TARGET
 
 target_link_libraries(kinetik-glass PRIVATE rt PkgConfig::DEPS)
 target_compile_options(kinetik-glass PRIVATE -Wall -Wextra -Wpedantic)
+# GCC's GNU-unique inline statics make dlclose retain a rejected plugin. Its
+# cached client ABI can then contaminate a freshly rebuilt replacement loaded
+# in the same compositor. Keep those statics local to each load's lifetime.
+target_compile_options(kinetik-glass PRIVATE $<$<CXX_COMPILER_ID:GNU>:-fno-gnu-unique>)
 set_target_properties(kinetik-glass PROPERTIES PREFIX "lib")

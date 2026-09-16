@@ -36,6 +36,20 @@ antialiased continuous-corner mask. It loads disabled by default.
 Hyprland plugins are ABI-sensitive. Rebuild Glass after every Hyprland
 upgrade, even when the source revision has not changed.
 
+Distribution package rebuilds can also change the ABI without changing the
+Hyprland version number, for example when Aquamarine changes. Compare the full
+`Version ABI string` from `Hyprland --version` (installed binary) and
+`hyprctl version` (running compositor). Restart the session when they differ,
+then rebuild and reload Glass. Garage installations use
+`garage-rebuild-plugins` to rebuild and deploy their pinned plugins.
+
+Glass rejects an ABI mismatch before inspecting compositor state or registering
+settings. If `plugin.kinetik_glass.*` settings are reported as unknown, check
+`hyprctl plugin list` first: the plugin may not have loaded. In Lua,
+`hl.plugin.load(path)` queues a load for the end of config parsing; a successful
+call does not mean Glass is available yet. Guard plugin settings using
+`hl.get_loaded_plugins()` until Hyprland reloads the config with Glass loaded.
+
 ## Build
 
 Install Hyprland development headers, CMake, pkg-config, and a C++ compiler,

@@ -167,6 +167,19 @@ static void attachGlass(PHLWINDOW window) {
 }
 
 APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
+  // Only the ABI handshake is safe before compatibility is established.
+  // Even inspecting the host's plugin list can dereference changed layouts
+  // after a Hyprland or dependency upgrade.
+  const std::string serverHash = __hyprland_api_get_hash();
+  const std::string clientHash = __hyprland_api_get_client_hash();
+
+  if (serverHash != clientHash)
+    throw std::runtime_error(
+        "[kinetik-glass] Hyprland ABI mismatch: server=" + serverHash +
+        " client=" + clientHash +
+        ". Rebuild Glass against the installed Hyprland headers and restart "
+        "Hyprland if the running compositor predates the upgrade.");
+
   PHANDLE = handle;
 
   // Hyprpm and a manually loaded development build can otherwise coexist
@@ -181,17 +194,6 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     if (duplicate != loadedPlugins.end())
       throw std::runtime_error(
           "[kinetik-glass] Another Glass instance is already loaded");
-  }
-
-  const std::string serverHash = __hyprland_api_get_hash();
-  const std::string clientHash = __hyprland_api_get_client_hash();
-
-  if (serverHash != clientHash) {
-    HyprlandAPI::addNotification(PHANDLE,
-                                 "[kinetik-glass] Plugin/header version mismatch",
-                                 CHyprColor{1.F, 0.2F, 0.2F, 1.F}, 5000);
-    throw std::runtime_error("[kinetik-glass] Hyprland ABI mismatch: server=" +
-                             serverHash + " client=" + clientHash);
   }
 
   g_config.enabled = makeShared<Config::Values::CBoolValue>(
